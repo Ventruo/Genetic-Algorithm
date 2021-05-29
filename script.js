@@ -10,24 +10,32 @@ var population = [];
 
 var population_size = 0;
 var elitism_size = 0;
-var generation_count = 0;
+var max_generation = 0;
 var crossover_prob = 0;
 var mutation_prob = 0;
+var generation_count = 0;
 function Start(){
     population_size = document.getElementById('popSize').value;
-    elitism_size = Math.round(population_size * 0.1);
+    elitism_size = Math.ceil(population_size * 0.1);
     if (elitism_size < 2) elitism_size = 2;
-    generation_count = document.getElementById('genCount').value;
+    max_generation = document.getElementById('genCount').value;
     crossover_prob = document.getElementById('crossProb').value;
     mutation_prob = document.getElementById('mutateProb').value;
+    generation_count = 0;
 
     initPopulation();
     GeneticAlgorithm();
+
+    console.log(population);
+    console.log('Generation Count : ' + generation_count);
+    printGene(population[0]);
 }
 
 function initPopulation(){
     //1 chromosome = lots of genes
     //1 gene = 1 data
+    population = [];
+
     for (let i = 0 ; i < population_size; i ++){
 
         genes = [];
@@ -36,7 +44,6 @@ function initPopulation(){
             genes[j] = row;
         }
         fitness = fitnessFunction(genes);
-        console.log(fitness);
 
         population[i] = new Chromosome(genes, fitness);
     }
@@ -44,17 +51,35 @@ function initPopulation(){
 }
 
 function GeneticAlgorithm(){
+    generation_count = 0;
+    while(population[0].fitness < 8 && generation_count < max_generation){
+        let newPopulation = [];
+        for (let i = 0 ; i <  Math.ceil(population_size/2) ; i++){
+            let selections = selection();
     
-    selection();
-
+            if (Math.random() <= crossover_prob){
+                let offsprings = crossover(population[selections.idx_parent_1].genes, population[selections.idx_parent_2].genes);
+                let mutated_offsprings = mutate(offsprings);
+                
+                for (let mutated_offspring of mutated_offsprings){
+                    let fitness = fitnessFunction(mutated_offspring);
+    
+                    newPopulation.push(new Chromosome(mutated_offspring, fitness));
+                }
+            }
+        }
+        population = population.concat(newPopulation);
+        sortFitness();
+        population = population.splice(0, population_size);
+        
+        generation_count++;
+    }
 }
 
 function fitnessFunction(genes){
     let alive = [1, 1, 1, 1, 1, 1, 1, 1];
 
-    console.log(genes);
     for (let column = 0 ; column < genes.length ; column ++){
-        console.log("column : " + column);
         for (let n = 1 ; n < genes.length - column ; n ++){
             // check right
             if (column + n <= 7)
@@ -63,21 +88,18 @@ function fitnessFunction(genes){
                 if (genes[column] == genes[column + n]){
                     alive[column] = 0;
                     alive[column + n] = 0;
-                    console.log('straight right, dead at ' + column + " - " + (column + n));
                 }
 
                 // check diagonal up
                 if (genes[column] == genes[column + n] - n){
                     alive[column] = 0;
                     alive[column + n] = 0;
-                    console.log('diagonal right up, dead at ' + column + " - " + (column + n));
                 }
 
                 // check diagonal down
                 if (genes[column] == genes[column + n] + n){
                     alive[column] = 0;
                     alive[column + n] = 0;
-                    console.log('diagonal right down, dead at ' + column + " - " + (column + n));
                 }
             }
 
@@ -87,21 +109,18 @@ function fitnessFunction(genes){
                 if (genes[column] == genes[column - n]){
                     alive[column] = 0;
                     alive[column - n] = 0;
-                    console.log('straight left, dead at ' + column + " - " + (column - n));
                 }
 
                 // check diagonal up
                 if (genes[column] == genes[column - n] - n){
                     alive[column] = 0;
                     alive[column - n] = 0;
-                    console.log('diagonal left up, dead at ' + column + " - " + (column - n));
                 }
 
                 // check diagonal down
                 if (genes[column] == genes[column - n] + n){
                     alive[column] = 0;
                     alive[column - n] = 0;
-                    console.log('diagonal left down, dead at ' + column + " - " + (column - n));
                 }
             }
         }
@@ -130,18 +149,71 @@ function compareFitness(a, b) {
 }
 
 function selection(){
-    
-}
+    // 2 array
+    let idx_parent_1 = -1;
+    let idx_parent_2 = -1;
+    while (idx_parent_1 == idx_parent_2){
+        let bestFitness = -1;
+        for(let i = 0; i < 5; i++){
+            let idx = Math.floor(Math.random() * population_size);
+            if (population[idx].fitness > bestFitness){
+                idx_parent_1 = idx;
+                bestFitness = population[idx].fitness;
+            }
+        }
 
-function randomParents(){
+        bestFitness = -1;
+        for(let i = 0; i < 5; i++){
+            let idx = Math.floor(Math.random() * population_size);
+            if (population[idx].fitness > bestFitness){
+                idx_parent_2 = idx;
+                bestFitness = population[idx].fitness;
+            }
+        }
+    }
     
+    return {
+        idx_parent_1, idx_parent_2
+    }
 }
 
 function crossover(gene1, gene2){
+    let a = gene1.filter((val, idx) => {
+        return idx < 4;
+    })
+    let b = gene1.filter((val, idx) => {
+        return idx > 3;
+    })
+    let c = gene2.filter((val, idx) => {
+        return idx < 4;
+    })
+    let d = gene2.filter((val, idx) => {
+        return idx > 3;
+    })
 
+    return [ a.concat(b), c.concat(d) ]
 }
 
-function mutate(genes){
+function mutate(offsprings){
+    for (let offspring of offsprings){
+        if (Math.random() <= mutation_prob){
+            let idx_mutate = Math.floor(Math.random() * 8);
+
+            let mutate_gene = Math.floor(Math.random() * 8);
+            while(offspring[idx_mutate] == mutate_gene){
+                mutate_gene = Math.floor(Math.random() * 8);
+            }
+            offspring[idx_mutate] = mutate_gene;
+        }
+    }
     
+    return offsprings;
 }
 
+function printGene(chromosome){
+    let res = "";
+    for (let gene of chromosome.genes){
+        res += "|" + gene + "|";
+    }
+    console.log(res, "fitness : " + chromosome.fitness);
+}
