@@ -45,8 +45,20 @@ function Start(){
         node.appendChild(img);
     });
 
+    document.getElementById('res').innerHTML = "Result : ";
+    if(population[0].fitness == 8){
+        let text = document.createElement('span');
+        text.classList.add('text-success');
+        text.innerHTML = " Solution found within " + generation_count + " generations";
+        document.getElementById('res').appendChild(text);
+    }else{
+        let text = document.createElement('span');
+        text.classList.add('text-danger');
+        text.innerHTML = " Solution not found, generation count : " + generation_count + " generations";
+        document.getElementById('res').appendChild(text);
+    }
+
     displayAllGenes(population);
-    console.log(population);
     printGene(population[0]);
 }
 
