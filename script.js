@@ -7,6 +7,9 @@ class Chromosome {
 
 var population = [];  
 
+// color 1 = #769656
+// color 2 = #EEEED2
+// color 3 = #BBCA44
 
 var population_size = 0;
 var elitism_size = 0;
@@ -14,6 +17,9 @@ var max_generation = 0;
 var crossover_prob = 0;
 var mutation_prob = 0;
 var generation_count = 0;
+
+
+
 function Start(){
     population_size = document.getElementById('popSize').value;
     elitism_size = Math.ceil(population_size * 0.1);
@@ -22,13 +28,48 @@ function Start(){
     crossover_prob = document.getElementById('crossProb').value;
     mutation_prob = document.getElementById('mutateProb').value;
     generation_count = 0;
+    document.getElementsByClassName('board')[0].innerHTML = "";
 
+    initBoard();
     initPopulation();
     GeneticAlgorithm();
 
     console.log(population);
     console.log('Generation Count : ' + generation_count);
+
+    population[0].genes.forEach((val, idx) => {
+        let node = document.getElementById(val + "," + idx);
+        let img = document.createElement('img');
+        img.setAttribute("width", "75px");
+        img.setAttribute('src', "queen.png");
+        node.appendChild(img);
+    });
+
+    displayAllGenes(population);
+    console.log(population);
     printGene(population[0]);
+}
+
+function initBoard(){
+    for(let i = 0; i < 8; i++){
+        for(let j = 0; j < 8; j++){
+            let node = document.createElement('div');
+            node.classList.add('tile');
+            node.setAttribute('id', i + "," + j);
+
+            if(i % 2 == 0 && j % 2 == 1){
+                node.classList.add('color1');
+            }else if(i % 2 == 0 && j % 2 == 0){
+                node.classList.add('color3');
+            }else if(i % 2 == 1 && j % 2 == 1){
+                node.classList.add('color3');
+            }else if(i % 2 == 1 && j % 2 == 0){
+                node.classList.add('color1');
+            }
+
+            document.getElementsByClassName('board')[0].appendChild(node);
+        }
+    }
 }
 
 function initPopulation(){
@@ -216,4 +257,49 @@ function printGene(chromosome){
         res += "|" + gene + "|";
     }
     console.log(res, "fitness : " + chromosome.fitness);
+}
+
+function displayOne(idx){
+    document.getElementsByClassName('board')[0].innerHTML = "";
+    initBoard();
+
+    let popSelected = population[idx];
+
+    popSelected.genes.forEach((val, idx) => {
+        let node = document.getElementById(val + "," + idx);
+        let img = document.createElement('img');
+        img.setAttribute("width", "75px");
+        img.setAttribute('src', "queen.png");
+        node.appendChild(img);
+    });
+}
+
+function displayAllGenes(population){
+    document.getElementById('result').innerHTML = "";
+    population.forEach((val, idx) => {
+        let tr = document.createElement('tr');
+        let td1 = document.createElement('td');
+        let td2 = document.createElement('td');
+        let td3 = document.createElement('td');
+        let td4 = document.createElement('td');
+
+        td1.innerHTML = idx + 1 + "";
+        td2.innerHTML = val.genes;
+        td3.innerHTML = val.fitness;
+
+        let button = document.createElement('button');
+        button.classList.add('btn');
+        button.classList.add('btn-info');
+        button.classList.add('text-white');
+        button.innerHTML = "Display";
+        button.setAttribute('onClick', `displayOne(${idx})`);
+        td4.appendChild(button);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+
+        document.getElementById('result').append(tr);
+    })
 }

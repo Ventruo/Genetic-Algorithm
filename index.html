@@ -5,22 +5,101 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genetic Algorithm 8 Queens</title>
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <style>
+        .board{
+            margin: 0 auto;
+            width: 640px;
+            height: 640px;
+        }
+
+        .tile{
+            width: 80px;
+            height: 80px;
+            color: green;
+            border: 2px solid black;
+            box-sizing: border-box;
+            float:left;
+        }
+
+        .color1{background-color: #769656;}
+        .color2{background-color: #EEEED2;}
+        .color3{background-color: #BBCA44;}
+    </style>
 </head>
-<body>
-    <label for="">Population Size : </label>
-    <input type="text" name="" id="popSize"><br>
+<body class="bg-white">
+    <div class="container-fluid">
+        <div class="row pt-5">
+            <div class="col-md-6">
+                <div class="board"></div>
+            </div>
+            <div class="col-md-6 px-5">
+                <div class="form-group">
+                    <label for="">Population Size : </label>
+                    <input type="text" name="" class="form-control" value="100" id="popSize">
+                </div>
+                <div class="mt-2"></div>
+                <div class="form-group">
+                    <label for="">Generations : </label>
+                    <input type="text" class="form-control" name="" value="20" id="genCount">
+                </div>
+                <div class="mt-2"></div>
+                <div class="form-group">
+                    <label for="">Crossover Probability : </label>
+                    <input type="text" class="form-control" name="" value="0.5" id="crossProb">
+                </div>
+                <div class="mt-2"></div>
+                <div class="form-group">
+                    <label for="">Mutation Probability : </label>
+                    <input type="text" class="form-control" name="" value="0.5" id="mutateProb">
+                </div>
+                <div class="mt-3"></div>
+                <button onclick="Start()" class="btn btn-success text-white">Start</button>
+                <!-- <button onclick="GeneticAlgorithm()" class="btn btn-info text-white">nextGen</button> -->
 
-    <label for="">Generations : </label>
-    <input type="text" name="" id="genCount"><br>
+                <div class="mt-5"></div>
+                <h3>Result</h3>
+                <div style="max-height: 300px !important; overflow: scroll;">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <th>No</th>
+                            <th>Genes</th>
+                            <th>Fitness</th>
+                            <th>Action</th>
+                        </thead>
+                        <tbody id="result">
+                            <tr>
+                                <td colspan="4">No Result</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <label for="">Crossover Probability : </label>
-    <input type="text" name="" id="crossProb"><br>
 
-    <label for="">Mutation Probability : </label>
-    <input type="text" name="" id="mutateProb"><br>
 
-    <button onclick="Start()">Start</button>
-    <button onclick="GeneticAlgorithm()">nextGen</button>
+    <!-- <div class="left w-50">
+        <div class="board"></div>
+    </div>
+
+    <div class="right w-50">
+        <label for="">Population Size : </label>
+        <input type="text" name="" id="popSize"><br>
+
+        <label for="">Generations : </label>
+        <input type="text" name="" id="genCount"><br>
+
+        <label for="">Crossover Probability : </label>
+        <input type="text" name="" id="crossProb"><br>
+
+        <label for="">Mutation Probability : </label>
+        <input type="text" name="" id="mutateProb"><br>
+
+        <button onclick="Start()">Start</button>
+        <button onclick="GeneticAlgorithm()">nextGen</button>
+    </div> -->
     <script src="./script.js"></script>
 </body>
 </html>
