@@ -202,25 +202,30 @@ function compareFitness(a, b) {
 }
 
 function selection(){
-    // 2 array
+    // Roulette Selection / Rank Selection
+    let sum_fitness = 0;
+    let cummulative_fitness = [];
+    for (let i = 0 ; i < population_size ; i++){
+        sum_fitness += population[i].fitness;
+        cummulative_fitness[i] = sum_fitness;
+    }
+    
     let idx_parent_1 = -1;
     let idx_parent_2 = -1;
     while (idx_parent_1 == idx_parent_2){
-        let bestFitness = -1;
-        for(let i = 0; i < 5; i++){
-            let idx = Math.floor(Math.random() * population_size);
-            if (population[idx].fitness > bestFitness){
-                idx_parent_1 = idx;
-                bestFitness = population[idx].fitness;
+        random = Math.floor(Math.random() * sum_fitness);
+        for (let i = 0 ; i < population_size ; i++){
+            if (cummulative_fitness[i] > random) {
+                idx_parent_1 = i;
+                break;
             }
         }
 
-        bestFitness = -1;
-        for(let i = 0; i < 5; i++){
-            let idx = Math.floor(Math.random() * population_size);
-            if (population[idx].fitness > bestFitness){
-                idx_parent_2 = idx;
-                bestFitness = population[idx].fitness;
+        random = Math.floor(Math.random() * sum_fitness);
+        for (let i = 0 ; i < population_size ; i++){
+            if (cummulative_fitness[i] > random) {
+                idx_parent_2 = i
+                break;
             }
         }
     }
