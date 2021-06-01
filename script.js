@@ -22,20 +22,31 @@ var generation_count = 0;
 
 function Start(){
     population_size = document.getElementById('popSize').value;
-    elitism_size = Math.ceil(population_size * 0.1);
-    if (elitism_size < 2) elitism_size = 2;
     max_generation = document.getElementById('genCount').value;
     crossover_prob = document.getElementById('crossProb').value;
     mutation_prob = document.getElementById('mutateProb').value;
+
+    if(crossover_prob < 0 || crossover_prob > 1){
+        alert('Crossover Probability tidak berada dalam range yang ditentukan');
+        return;
+    }
+
+    if(mutation_prob < 0 || mutation_prob > 1){
+        alert('Mutation Probability tidak berada dalam range yang ditentukan');
+        return;
+    }
+
+    if(max_generation <= 0 || population_size < 10){
+        alert('Max Generation harus lebih besar dari 0 dan Population Size harus minimal 10');
+        return;
+    }
+
     generation_count = 0;
     document.getElementsByClassName('board')[0].innerHTML = "";
 
     initBoard();
     initPopulation();
     GeneticAlgorithm();
-
-    console.log(population);
-    console.log('Generation Count : ' + generation_count);
 
     population[0].genes.forEach((val, idx) => {
         let node = document.getElementById(val + "," + idx);
@@ -103,6 +114,7 @@ function initPopulation(){
     sortFitness();
 }
 
+
 function GeneticAlgorithm(){
     generation_count = 0;
     while(population[0].fitness < 8 && generation_count < max_generation){
@@ -113,12 +125,13 @@ function GeneticAlgorithm(){
             if (Math.random() <= crossover_prob){
                 let offsprings = crossover(population[selections.idx_parent_1].genes, population[selections.idx_parent_2].genes);
                 let mutated_offsprings = mutate(offsprings);
-                
                 for (let mutated_offspring of mutated_offsprings){
                     let fitness = fitnessFunction(mutated_offspring);
     
                     newPopulation.push(new Chromosome(mutated_offspring, fitness));
                 }
+
+                
             }
         }
         population = population.concat(newPopulation);
@@ -212,8 +225,10 @@ function selection(){
     
     let idx_parent_1 = -1;
     let idx_parent_2 = -1;
+
     while (idx_parent_1 == idx_parent_2){
         random = Math.floor(Math.random() * sum_fitness);
+
         for (let i = 0 ; i < population_size ; i++){
             if (cummulative_fitness[i] > random) {
                 idx_parent_1 = i;
@@ -273,7 +288,6 @@ function printGene(chromosome){
     for (let gene of chromosome.genes){
         res += "|" + gene + "|";
     }
-    console.log(res, "fitness : " + chromosome.fitness);
 }
 
 function displayOne(idx){
